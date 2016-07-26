@@ -12,7 +12,7 @@
 
 # 这条配置可以指定这个包下类在第二及其他dex中.
 #android.support.v?.**
-#将全部类移除主Dex
+#将全部类移出主Dex
 -split **.**
 
 # 不包含Android gradle 插件自动生成的miandex列表.(不用系统自带分包策略)

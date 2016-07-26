@@ -36,8 +36,8 @@ public class DexKnifePlugin implements Plugin<Project> {
                                         componentName.endsWith("${it}")
                                     }
                                     def bool = result != null;
-                                    if (!bool) {
-                                        printf "main-dex-filter: skipping ${componentName}\n"
+                                    if (bool) {
+                                        printf "main-dex-filter: keep ${componentName}\n"
                                     }
                                     return bool
                                 }
