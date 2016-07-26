@@ -1,0 +1,89 @@
+apply plugin: 'com.android.application'
+apply plugin: 'com.ceabie.dexnkife'
+
+android {
+    compileSdkVersion Integer.parseInt(project.COMPILE_SDK_VER)
+    buildToolsVersion project.BUILD_TOOLS_VER
+
+    defaultConfig {
+        minSdkVersion Integer.parseInt(project.MIN_SDK_VER)
+        targetSdkVersion Integer.parseInt(project.TARGET_SDK_VERSION)
+        versionCode 1
+        versionName "1.0"
+
+        multiDexEnabled true
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+
+        debug {
+//            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+//    productFlavors {
+//        flavor1 {
+//            versionCode 20
+//        }
+//
+//        flavor2 {
+//            minSdkVersion 14
+//            multiDexEnabled false
+//        }
+//    }
+
+    packagingOptions {
+        exclude ".readme"
+    }
+}
+
+dependencies {
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile "com.android.support:appcompat-v7:${SUPPORT_VERSION}"
+    compile "io.reactivex:rxjava:${RX_JAVA}"
+    compile "io.reactivex:rxandroid:${RX_ANDROID}"
+    compile 'com.android.support:multidex:1.0.1'
+}
+
+// 要放到第二个dex中的包名前缀 second_dex_package_list.txt
+// Set the prefix of package's path in second_dex_package_list.txt
+/*project.afterEvaluate {
+    File file = project.file(DexSplitTools.DEX_KNIFE_CFG_TXT)
+    if (file != null) {
+        def justActivitys = [];
+        file.eachLine { line ->
+            //printf "read line ${line}\n";
+            if (line.startsWith('-just activity')) {
+                line = line.replaceAll('-just activity', '').trim();
+                justActivitys.add(line)
+            }
+        }
+        printf "-just activity size = ${justActivitys.size()}\n";
+        if (justActivitys.size() != 0) {
+            project.tasks.each { task ->
+                if (task.name.startsWith('collect') && task.name.endsWith('MultiDexComponents')) {
+                    println "main-dex-filter: found task $task.name"
+                    task.filter { name, attrs ->
+                        String componentName = attrs.get('android:name')
+                        if ('activity'.equals(name)) {
+                            def result = justActivitys.find {
+                                componentName.endsWith("${it}")
+                            }
+                            def bool = result != null;
+                            if (!bool) {
+                                printf "main-dex-filter: skipping ${componentName}\n"
+                            }
+                            return bool
+                        }
+                        return true
+                    }
+                }
+            }
+        }
+    }
+}*/

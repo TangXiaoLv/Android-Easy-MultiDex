@@ -1,0 +1,25 @@
+#为注释符
+
+#-----------主Dex中必要依赖的脚本配置-----------
+#默认保留四大组件中其他三大组件，Activity组件选择性保留(使用-just activity 选项),若为空默认保留所有Activity
+-just activity com.ceabie.demo.MainActivity
+
+#-----------附加类-----------
+# 如果你想要某个包路径在maindex中，则使用 -keep 选项，即使他已经在分包的路径中.若为空，默认保留所有
+
+# 保留单个类.
+#-keep android.support.v7.app.AppCompatDialogFragment.class
+
+# 这条配置可以指定这个包下类在第二及其他dex中.
+#android.support.v?.**
+#将全部类移除主Dex
+-split **.**
+
+# 不包含Android gradle 插件自动生成的miandex列表.(不用系统自带分包策略)
+#-donot-use-suggest
+
+# 不进行dex分包， 直到 dex 的id数量超过 65536.(设置自动执行分包策略)
+#-auto-maindex
+
+# 显示miandex的日志.
+#-log-mainlist
