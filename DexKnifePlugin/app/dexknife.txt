@@ -6,6 +6,7 @@
 
 #-----------附加类-----------
 # 如果你想要某个包路径在maindex中，则使用 -keep 选项，即使他已经在分包的路径中.若为空，默认保留所有
+#-keep com.ceabie.demo.**
 
 # 保留单个类.
 #-keep android.support.v7.app.AppCompatDialogFragment.class

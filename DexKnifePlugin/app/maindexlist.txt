@@ -1,7 +1,7 @@
-rx/annotations/Beta.class
-rx/annotations/Experimental.class
 rx/android/concurrency/AndroidSchedulers.class
 rx/android/concurrency/HandlerThreadScheduler.class
+rx/annotations/Beta.class
+rx/annotations/Experimental.class
 android/support/annotation/StyleableRes.class
 android/support/annotation/IntDef.class
 android/support/annotation/AnyRes.class
@@ -134,6 +134,7 @@ android/support/v4/app/ActivityCompatHoneycomb.class
 android/support/v7/appcompat/R$styleable.class
 android/support/v7/appcompat/R.class
 com/ceabie/demo/AppApplication.class
+com/ceabie/demo/FirstActivity.class
 com/ceabie/demo/MainActivity$1.class
 com/ceabie/demo/MainActivity.class
 demo/ceabie/com/demo/R$id.class

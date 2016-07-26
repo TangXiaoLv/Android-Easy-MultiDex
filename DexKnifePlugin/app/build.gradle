@@ -26,17 +26,6 @@ android {
         }
     }
 
-//    productFlavors {
-//        flavor1 {
-//            versionCode 20
-//        }
-//
-//        flavor2 {
-//            minSdkVersion 14
-//            multiDexEnabled false
-//        }
-//    }
-
     packagingOptions {
         exclude ".readme"
     }
@@ -52,38 +41,3 @@ dependencies {
 
 // 要放到第二个dex中的包名前缀 second_dex_package_list.txt
 // Set the prefix of package's path in second_dex_package_list.txt
-/*project.afterEvaluate {
-    File file = project.file(DexSplitTools.DEX_KNIFE_CFG_TXT)
-    if (file != null) {
-        def justActivitys = [];
-        file.eachLine { line ->
-            //printf "read line ${line}\n";
-            if (line.startsWith('-just activity')) {
-                line = line.replaceAll('-just activity', '').trim();
-                justActivitys.add(line)
-            }
-        }
-        printf "-just activity size = ${justActivitys.size()}\n";
-        if (justActivitys.size() != 0) {
-            project.tasks.each { task ->
-                if (task.name.startsWith('collect') && task.name.endsWith('MultiDexComponents')) {
-                    println "main-dex-filter: found task $task.name"
-                    task.filter { name, attrs ->
-                        String componentName = attrs.get('android:name')
-                        if ('activity'.equals(name)) {
-                            def result = justActivitys.find {
-                                componentName.endsWith("${it}")
-                            }
-                            def bool = result != null;
-                            if (!bool) {
-                                printf "main-dex-filter: skipping ${componentName}\n"
-                            }
-                            return bool
-                        }
-                        return true
-                    }
-                }
-            }
-        }
-    }
-}*/
