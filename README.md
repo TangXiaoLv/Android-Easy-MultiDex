@@ -170,3 +170,10 @@ Error:Execution failed for task ':Toon:transformClassesWithDexForDebug'.> java.l
 Unsupported major.minor version 52.0
 ```
 将JDK升级到1.8
+
+**错误3：**  
+```
+Error:Execution failed for task ':app:transformClassesWithDexForDebug'.
+> DexKnife Warnning: Main dex is EMPTY ! Check your config and project!
+```
+gradle 切到 1.5.0
