@@ -96,7 +96,7 @@ afterEvaluate {
 ```
 
 ###坑6：主dex依然爆表，shit again！  
-其实上面那段脚本已经成功筛选出我们想要放入主Dex的`manifest_keep列表`和`maindexlist列表`，但是在打包的时候还是把所有类打进主Dex(已无语)。这个时候就需要跟[DexKnifePlugin](https://github.com/ceabie/DexKnifePlugin)插件配合使用，首先在gradle中加上上述脚本，然后使用插件时在配置文件中加上 `-split **.**`和`#-donot-use-suggest`。DexKnifePlugin插件运行原理很简单，在生成Dex任务之前首先读取自己的配置文件(同时附加上我们前面通过Gradle脚本生成的`maindexlist`)，然后扫描combined.jar(包含工程中所有.class文件)匹配出我们自定义的maindexlist.txt，再替换掉build/multi-dex/maindexlist.txt，和build实例。这样分包的时候就会基于我们的规则生成主Dex。
+其实上面那段脚本已经成功筛选出我们想要放入主Dex的`manifest_keep列表`和`maindexlist列表`，但是在打包的时候还是把所有类打进主Dex(已无语)。这个时候就需要跟[DexKnifePlugin](https://github.com/ceabie/DexKnifePlugin)插件配合使用，首先在gradle中加上上述脚本，然后使用插件时在配置文件中加上 `-split **.**`和`#-donot-use-suggest`。DexKnifePlugin插件运行原理很简单，在生成Dex任务之前首先读取自己的配置文件(包含前面我们通过Gradle脚本生成的`maindexlist`列表)，然后扫描combined.jar(包含工程中所有.class文件)匹配出我们自定义的maindexlist.txt，再替换掉build/multi-dex/maindexlist.txt，和build实例。这样分包的时候就会基于我们的规则生成主Dex。
 
 ###Congratulation
 恭喜，填坑终于结束，不过还有点不爽的是需要同时维护Gradle脚本和插件的配置。
