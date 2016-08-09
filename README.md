@@ -143,7 +143,7 @@ apply plugin: 'com.ceabie.dexnkife'
 #-keep android.support.v7.app.AppCompatDialogFragment.class
 
 # 这条配置可以指定这个包下类在第二及其他dex中.
-#android.support.v?.**
+#-split android.support.v?.**
 #将全部类移出主Dex
 -split **.**
 
