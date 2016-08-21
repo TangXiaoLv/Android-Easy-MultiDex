@@ -1,6 +1,6 @@
 #Android傻瓜式分包插件
 注1：不想看前半部分的话可以直接跳过到最下面配置部分。  
-注2：本插件是基于[DexKnifePlugin 1.5.2](https://github.com/ceabie/DexKnifePlugin)优化改造而来，感谢ceabie的无私奉献。
+注2：本插件是基于[DexKnifePlugin 1.5.3](https://github.com/ceabie/DexKnifePlugin)优化改造而来，感谢ceabie的无私奉献。
 
 ##填坑之路  
 ###坑1：65536 ，So easy!   
@@ -131,6 +131,8 @@ apply plugin: 'com.ceabie.dexnkife'
 
 **第四步：在你的App模块目录下新建dexknife.txt，并自定义配置**
 ```
+#为注释符
+
 #-----------主Dex中必要依赖的脚本配置-----------
 #默认保留四大组件中其他三大组件，Activity组件选择性保留(使用-just activity 选项),若为空不保留任何Activity
 -just activity com.ceabie.demo.MainActivity
@@ -162,7 +164,9 @@ apply plugin: 'com.ceabie.dexnkife'
 
 ##已知错误
 
-**错误1：**
+注：分包的时候如果发现一些莫名的错误，可以关掉instant run，一般都能解决
+
+**错误1：** (已修复)
 ```
 Error:Execution failed for task ':Toon:transformClassesWithDexForDebug'.> java.lang.NullPointerException (no error message)
 ```
@@ -172,9 +176,9 @@ Error:Execution failed for task ':Toon:transformClassesWithDexForDebug'.> java.l
 ```
 Unsupported major.minor version 52.0
 ```
-将JDK升级到1.8
+由于插件中使用到了JDK1.8的一些API，所以将JDK升级到1.8就可以了
 
-**错误3：**  
+**错误3：** (已修复)
 ```
 Error:Execution failed for task ':app:transformClassesWithDexForDebug'.
 > DexKnife Warnning: Main dex is EMPTY ! Check your config and project!

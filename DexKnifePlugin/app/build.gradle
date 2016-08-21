@@ -38,6 +38,3 @@ dependencies {
     compile "io.reactivex:rxandroid:${RX_ANDROID}"
     compile 'com.android.support:multidex:1.0.1'
 }
-
-// 要放到第二个dex中的包名前缀 second_dex_package_list.txt
-// Set the prefix of package's path in second_dex_package_list.txt

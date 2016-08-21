@@ -40,7 +40,7 @@ uploadArchives {
     repositories {
         mavenDeployer {
             repository(url: uri('../repo'))
-            pom.version = "2.0.0"
+            pom.version = "2.0.1"
             pom.artifactId = "gradle-dexknife-plugin"
             pom.groupId = "com.ceabie.dextools"
         }

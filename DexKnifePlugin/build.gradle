@@ -6,8 +6,8 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.1.2'
-        classpath 'com.ceabie.dextools:gradle-dexknife-plugin:2.0.0'
+        classpath 'com.android.tools.build:gradle:2.1.0'
+        classpath 'com.ceabie.dextools:gradle-dexknife-plugin:2.0.1'
     }
 }
 

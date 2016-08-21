@@ -1,6 +1,19 @@
+/*
+ * Copyright (C) 2016 ceabie (https://github.com/ceabie/)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.ceabie.dexknife;
-
-import com.android.builder.Version;
 
 import org.gradle.api.Project;
 import org.gradle.api.file.FileTreeElement;
@@ -71,27 +84,14 @@ public class DexSplitTools {
         System.out.println("DexKnife Finished: " + time);
     }
 
-    static int getAndroidPluginVersion() {
-        String version = Version.ANDROID_GRADLE_PLUGIN_VERSION;
-        int size = version.length();
-        int ver = 0;
-        for (int i = 0; i < size; i++) {
-            char c = version.charAt(i);
-            if (Character.isDigit(c) || c == '.') {
-                if (c != '.') {
-                    ver = ver * 10 + c - '0';
-                }
-            } else {
-                break;
-            }
-        }
-
-        return ver;
-    }
-
     public static boolean processMainDexList(Project project, boolean minifyEnabled, File mappingFile,
                                              File jarMergingOutputFile, File andMainDexList,
                                              DexKnifeConfig dexKnifeConfig) throws Exception {
+
+        if (!minifyEnabled && jarMergingOutputFile == null) {
+            System.out.println("DexKnife Error: jarMerging is Null! Skip DexKnife. Please report All Gradle Log.");
+            return false;
+        }
 
         return genMainDexList(project, minifyEnabled, mappingFile, jarMergingOutputFile,
                 andMainDexList, dexKnifeConfig);
@@ -171,7 +171,7 @@ public class DexSplitTools {
             getMaindexSpec(dexKnifeConfig.patternSet);
         } else {
             dexKnifeConfig.useSuggest = true;
-            System.err.println("DexKnife Warnning: NO SET split Or keep path, it will use Suggest!");
+            System.err.println("DexKnife Warning: NO SET split Or keep path, it will use Suggest!");
         }
 
         dexKnifeConfig.additionalParameters = addParams;
@@ -245,11 +245,11 @@ public class DexSplitTools {
 
         ArrayList<String> mainClasses = null;
         if (minifyEnabled) {
-            System.out.println("DexKnife: From Mapping");
+            System.err.println("DexKnife: From Mapping");
             // get classes from mapping
             mainClasses = getMainClassesFromMapping(mappingFile, dexKnifeConfig.patternSet, mainCls);
         } else {
-            System.out.println("DexKnife: From Merged Jar: " + jarMergingOutputFile);
+            System.err.println("DexKnife: From Merged Jar: " + jarMergingOutputFile);
             if (jarMergingOutputFile != null) {
                 // get classes from merged jar
                 mainClasses = getMainClassesFromJar(jarMergingOutputFile, dexKnifeConfig.patternSet, mainCls);
@@ -275,7 +275,7 @@ public class DexSplitTools {
             return true;
         }
 
-        throw new Exception("DexKnife Warnning: Main dex is EMPTY ! Check your config and project!");
+        throw new Exception("DexKnife Warning: Main dex is EMPTY ! Check your config and project!");
     }
 
     private static ArrayList<String> getMainClassesFromJar(
@@ -348,7 +348,7 @@ public class DexSplitTools {
      */
     private static HashSet<String> getAdtMainDexClasses(File outputDir) throws Exception {
         if (outputDir == null || !outputDir.exists()) {
-            System.err.println("DexKnife Warnning: Android recommand Main dex is no exist, try run again!");
+            System.err.println("DexKnife Warning: Android recommand Main dex is no exist, try run again!");
             return null;
         }
 
