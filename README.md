@@ -119,7 +119,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.ceabie.dextools:gradle-dexknife-plugin:2.0.0'
+        classpath 'com.ceabie.dextools:gradle-dexknife-plugin:2.0.1'
     }
 }
 
