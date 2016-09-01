@@ -134,7 +134,7 @@ apply plugin: 'com.ceabie.dexnkife'
 #为注释符
 
 #-----------主Dex中必要依赖的脚本配置-----------
-#默认保留四大组件中其他三大组件，Activity组件选择性保留(使用-just activity 选项),若为空不保留任何Activity
+#默认保留四大组件中其他三大组件(并计算其依赖树)，Activity组件选择性保留(使用-just activity 选项),若为空不保留任何Activity
 -just activity com.ceabie.demo.MainActivity
 
 #-----------附加类-----------
@@ -149,7 +149,7 @@ apply plugin: 'com.ceabie.dexnkife'
 #将全部类移出主Dex
 -split **.**
 
-# 不包含Android gradle 插件自动生成的miandex列表.(不用系统自带分包策略)
+# 不包含Android gradle 插件自动生成的miandex列表.(不使用建议的依赖树，注释掉表示使用,否则-just activity无效)
 #-donot-use-suggest
 
 # 不进行dex分包， 直到 dex 的id数量超过 65536.(设置自动执行分包策略)
