@@ -19,6 +19,11 @@
 # 不包含Android gradle 插件自动生成的miandex列表.(不使用建议的依赖树，注释掉表示使用,否则-just activity无效)
 #-donot-use-suggest
 
+# (分割每个dex的方法数上限) 扩展参数:例如 --set-max-idx-number=50000
+# 如果出现 DexException: Too many classes in --main-dex-list, main dex capacity exceeded：
+# 表明限制的方法数小于main dex的必要方法数，调大到合适数值即可
+-dex-param --set-max-idx-number=4000
+
 # 不进行dex分包， 直到 dex 的id数量超过 65536.(设置自动执行分包策略)
 #-auto-maindex
 
