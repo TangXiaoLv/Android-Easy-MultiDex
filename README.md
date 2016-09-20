@@ -1,6 +1,6 @@
 #Android傻瓜式分包插件
 注1：不想看前半部分的话可以直接跳过到最下面配置部分。  
-注2：本插件是基于[DexKnifePlugin 1.5.3](https://github.com/ceabie/DexKnifePlugin)优化改造而来，感谢ceabie的无私奉献。
+注2：本插件是基于[DexKnifePlugin 1.5.6](https://github.com/ceabie/DexKnifePlugin)优化改造而来，感谢ceabie的无私奉献。
 
 ##填坑之路  
 ###坑1：65536 ，So easy!   
@@ -119,7 +119,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.ceabie.dextools:gradle-dexknife-plugin:2.0.1'
+        classpath 'com.ceabie.dextools:gradle-dexknife-plugin:2.0.2'
     }
 }
 
@@ -176,7 +176,7 @@ Error:Execution failed for task ':Toon:transformClassesWithDexForDebug'.> java.l
 ```
 发生此错误只要切换一次Gradle版本就OK了，比如1.5.0
 
-**错误2：**
+**错误2：**(已修复)
 ```
 Unsupported major.minor version 52.0
 ```

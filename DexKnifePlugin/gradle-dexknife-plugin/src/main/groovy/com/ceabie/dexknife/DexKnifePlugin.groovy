@@ -20,8 +20,6 @@ import org.gradle.api.Project
 
 /**
  * the spilt tools plugin.
- *
- * @author ceabie
  */
 public class DexKnifePlugin implements Plugin<Project> {
 

@@ -25,8 +25,11 @@ import java.util.Set;
  * @author ceabie
  */
 public class DexKnifeConfig {
-    public PatternSet patternSet;
-    public boolean useSuggest = true;
-    public boolean logMainList = false;
-    public Set<String> additionalParameters;
+    PatternSet patternSet;
+    PatternSet suggestPatternSet;
+    boolean useSuggest = true;
+    boolean filterSuggest = false;
+    boolean logMainList = false;
+    boolean logFilterSuggest = false;
+    Set<String> additionalParameters;
 }
