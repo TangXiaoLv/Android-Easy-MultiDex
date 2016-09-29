@@ -107,28 +107,38 @@ afterEvaluate {
 于是乎就将Gradle脚本整合进了插件，这样只需维护一个配置文件就行了。读者可以根据自己需求自行选择分开配置还是整合配置。通过这种方式我们把主Dex的方法数维持在15000左右，从此再也不用担心方法数问题了！！！
 
 ##配置部分
-**第一步：将repo目录复制到项目根目录**  
-
-**第二步：添加根目录Gradle**
+**第一步：添加根目录Gradle**
 ```
 buildscript {
-    repositories {
-        maven { 
-		url uri('repo')
-	}
-    }
-
     dependencies {
-        classpath 'com.ceabie.dextools:gradle-dexknife-plugin:2.0.2'
+        classpath 'com.library.tangxiaolv:dexknife-plus:1.0.1'
     }
 }
+```
+**第二步：在你的App模块的build.gradle添加插件**
+```
+apply plugin: 'dexknifePlus'
+```
+**第三步：配置参数**  
+```
+dexKnife{
+    //必选参数
+    enabled true //if false,禁用分包插件
+    //可选参数
+    //1.如果没有可选参数，将根据enabled决定是否分包。
+    //2.如果有可选参数，需满足必选参数和可选参数的条件才允许分包
+    productFlavor 'mock'
+    buildType 'debug'
 
+    /*
+    *eg:当前productFlavors = dev，buildType = debug，
+    *参数组合1：enabled = true，productFlavor = dev，buildType = debug 分包
+    *参数组合2：enabled = true，productFlavor = mock，buildType = debug 不分包
+    *参数组合1：enabled = true，buildType = debug 所有buildType = debug分包
+    *参数组合1：enabled = true，productFlavor = dev 所有productFlavor = dev分包
+    * */
+}
 ```
-**第三步：在你的App模块的build.gradle添加插件**
-```
-apply plugin: 'com.ceabie.dexnkife'
-```
-
 **第四步：在你的App模块目录下新建dexknife.txt，并自定义配置**
 ```
 #为注释符

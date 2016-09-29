@@ -1,5 +1,5 @@
 apply plugin: 'com.android.application'
-apply plugin: 'com.ceabie.dexnkife'
+apply plugin: 'dexknifePlus'
 
 android {
     compileSdkVersion Integer.parseInt(project.COMPILE_SDK_VER)
@@ -12,6 +12,16 @@ android {
         versionName "1.0"
 
         multiDexEnabled true
+    }
+
+    productFlavors{
+        dev{
+
+        }
+
+        mock{
+
+        }
     }
 
     buildTypes {
@@ -29,6 +39,24 @@ android {
     packagingOptions {
         exclude ".readme"
     }
+}
+
+dexKnife{
+    //必选参数
+    enabled true //if false,禁用分包插件
+    //可选参数
+    //1.如果没有可选参数，将根据enabled决定是否分包。
+    //2.如果有可选参数，需满足必选参数和可选参数的条件才允许分包
+    productFlavor 'mock'
+    buildType 'debug'
+
+    /*
+    *eg:当前productFlavors = dev，buildType = debug，
+    *参数组合1：enabled = true，productFlavor = dev，buildType = debug 分包
+    *参数组合2：enabled = true，productFlavor = mock，buildType = debug 不分包
+    *参数组合1：enabled = true，buildType = debug 所有buildType = debug分包
+    *参数组合1：enabled = true，productFlavor = dev 所有productFlavor = dev分包
+    * */
 }
 
 dependencies {

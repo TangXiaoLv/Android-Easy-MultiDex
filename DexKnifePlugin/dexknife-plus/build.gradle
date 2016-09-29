@@ -1,0 +1,74 @@
+buildscript {
+    repositories {
+        mavenLocal()
+        jcenter()
+    }
+
+    dependencies {
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.4'
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:1.4.1'
+    }
+}
+
+apply plugin: 'groovy'
+apply plugin: 'com.jfrog.bintray'
+
+configurations {
+    provided {
+        dependencies.all { dep ->
+            configurations.default.exclude group: dep.group, module: dep.name
+        }
+    }
+    compile.extendsFrom provided
+}
+
+dependencies {
+    compile gradleApi()
+    compile localGroovy()
+    provided 'com.android.tools.build:builder:2.1.3'
+    provided 'com.android.tools.build:gradle-core:2.1.3'
+}
+
+tasks.withType(Javadoc) {
+//    enabled = false //禁用生成javadoc的任务
+    options.encoding = "UTF-8"
+}
+
+ext {
+    bintrayRepo = 'maven'
+    bintrayName = "$LIBRARY_NAME" //maven 仓库中的包名
+
+    publishedGroupId = "$GROUP_ID"
+    libraryName = "$LIBRARY_NAME"
+    artifact = "$LIBRARY_NAME"//必须跟Model名一样
+
+    libraryDescription = 'android multidex plugin'
+
+    siteUrl = 'https://github.com/TangXiaoLv/Android-Easy-MultiDex'
+    gitUrl = 'https://github.com/TangXiaoLv/Android-Easy-MultiDex.git'
+
+    libraryVersion = "$PUBLIC_VERSION"
+
+    developerId = 'tangxiaolv'
+    developerName = 'XiaoLv Tang'
+    developerEmail = 'imbatang@gmail.com'
+
+    licenseName = 'The Apache Software License, Version 2.0'
+    licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+    allLicenses = ["Apache-2.0"]
+}
+
+// Place it at the end of the file
+apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/installv1.gradle'
+apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/bintrayv1.gradle'
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: uri('../repo'))
+            pom.groupId = "$GROUP_ID"
+            pom.artifactId = "$LIBRARY_NAME"
+            pom.version = "$LOCAL_VERSION"
+        }
+    }
+}

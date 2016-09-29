@@ -6,3 +6,15 @@
 .DS_Store
 /build
 /captures
+local.properties
+.idea/compiler.xml
+.idea/copyright/
+.idea/encodings.xml
+.idea/gradle.xml
+.idea/misc.xml
+.idea/qaplug_profiles.xml
+gradle/
+gradlew
+gradlew.bat
+repo/com/ceabie/
+repo/com/library/
