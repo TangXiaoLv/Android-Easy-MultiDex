@@ -167,7 +167,7 @@ dexKnife{
 # 表明限制的方法数小于main dex的必要方法数，调大到合适数值即可
 -dex-param --set-max-idx-number=4000
 
-# 不进行dex分包， 直到 dex 的id数量超过 65536.(设置自动执行分包策略)
+# 注释掉将执行自定义dex分包，否则执行默认分包.
 #-auto-maindex
 
 # 显示miandex的日志.
