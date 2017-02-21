@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.ceabie.dexknife;
 
 import org.gradle.api.Project;
 import org.gradle.api.file.FileTreeElement;
+import org.gradle.api.specs.NotSpec;
+import org.gradle.api.specs.OrSpec;
 import org.gradle.api.specs.Spec;
 import org.gradle.api.specs.Specs;
 import org.gradle.api.tasks.util.PatternSet;
@@ -81,27 +82,27 @@ public class DexSplitTools {
         System.out.println("DexKnife Finished: " + time);
     }
 
-    public static boolean processMainDexList(Project project, boolean minifyEnabled,
-            File mappingFile,
-            File jarMergingOutputFile, File andMainDexList,
-            DexKnifeConfig dexKnifeConfig) throws Exception {
+    public static boolean processMainDexList(Project project, boolean minifyEnabled, File mappingFile,
+                                             File jarMergingOutputFile, File andMainDexList,
+                                             DexKnifeConfig dexKnifeConfig) throws Exception {
 
         if (!minifyEnabled && jarMergingOutputFile == null) {
-            System.out.println(
-                    "DexKnife Error: jarMerging is Null! Skip DexKnife. Please report All Gradle Log.");
+            System.out.println("DexKnife Error: jarMerging is Null! Skip DexKnife. Please report All Gradle Log.");
             return false;
         }
 
-        return genMainDexList(project, minifyEnabled, mappingFile, jarMergingOutputFile,
-                andMainDexList, dexKnifeConfig);
+        try {
+            return genMainDexList(project, minifyEnabled, mappingFile, jarMergingOutputFile,
+                    andMainDexList, dexKnifeConfig);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return false;
     }
 
     /**
      * get the config of dex knife
-     * 
-     * @param project project
-     * @return DexKnifeConfig
-     * @throws Exception exception
      */
     protected static DexKnifeConfig getDexKnifeConfig(Project project) throws Exception {
         BufferedReader reader = new BufferedReader(new FileReader(project.file(DEX_KNIFE_CFG_TXT)));
@@ -188,15 +189,14 @@ public class DexSplitTools {
             addParams.add(DEX_MINIMAL_MAIN_DEX);
         }
 
+        // 使用ADT建议的mainlist
         if (dexKnifeConfig.useSuggest) {
+
+            // 将全局过滤应用到建议的mainlist
             if (dexKnifeConfig.filterSuggest) {
                 splitSuggest.addAll(splitToSecond);
                 keepSuggest.addAll(keepMain);
             }
-
-            // for (String s : splitSuggest) {
-            // System.out.println("Suggest: " + s);
-            // }
 
             if (!splitSuggest.isEmpty() || !keepSuggest.isEmpty()) {
                 dexKnifeConfig.suggestPatternSet = new PatternSet()
@@ -206,9 +206,6 @@ public class DexSplitTools {
         }
 
         if (!splitToSecond.isEmpty() || !keepMain.isEmpty()) {
-            // for (String s : splitToSecond) {
-            // System.out.println(s);
-            // }
             dexKnifeConfig.patternSet = new PatternSet()
                     .exclude(splitToSecond)
                     .include(keepMain);
@@ -259,12 +256,12 @@ public class DexSplitTools {
             }
 
             if (includeSpec != null && excludeSpec != null) {
-                maindexSpec = Specs.or(includeSpec, Specs.not(excludeSpec));
+                maindexSpec = new OrSpec<>(includeSpec, new NotSpec<>(excludeSpec));
             } else {
                 if (excludeSpec == null) {
                     maindexSpec = Specs.satisfyAll();
                 } else {
-                    maindexSpec = Specs.not(excludeSpec);
+                    maindexSpec = new NotSpec<>(excludeSpec);
                 }
             }
         }
@@ -276,17 +273,23 @@ public class DexSplitTools {
         return maindexSpec;
     }
 
+
+    private static boolean isPatternSetEmpty(PatternSet patternSet) {
+        return patternSet.getExcludes().isEmpty() && patternSet.getIncludes().isEmpty()
+                && patternSet.getExcludeSpecs().isEmpty() && patternSet.getIncludeSpecs().isEmpty();
+    }
+
     /**
      * generate the main dex list
      */
     private static boolean genMainDexList(Project project, boolean minifyEnabled,
-            File mappingFile, File jarMergingOutputFile,
-            File andMainDexList, DexKnifeConfig dexKnifeConfig) throws Exception {
+                                          File mappingFile, File jarMergingOutputFile,
+                                          File andMainDexList, DexKnifeConfig dexKnifeConfig) throws Exception {
 
         System.out.println(":" + project.getName() + ":genMainDexList");
 
-        // get the adt's maindexlist
-        HashSet<String> mainCls = null;
+        // 1.get the adt's maindexlist
+        Map<String, Boolean> adtMainClasses = null;
         if (dexKnifeConfig.useSuggest) {
 
             PatternSet patternSet = dexKnifeConfig.suggestPatternSet;
@@ -294,31 +297,43 @@ public class DexSplitTools {
                 patternSet = dexKnifeConfig.patternSet;
             }
 
-            mainCls = getAdtMainDexClasses(andMainDexList, patternSet,
-                    dexKnifeConfig.logFilterSuggest);
             System.out.println("DexKnife: use suggest");
+            adtMainClasses = getAdtMainDexClasses(andMainDexList, patternSet, dexKnifeConfig.logFilterSuggest);
         }
 
         File keepFile = project.file(MAINDEXLIST_TXT);
         keepFile.delete();
 
-        ArrayList<String> mainClasses = null;
-        if (minifyEnabled) {
-            System.err.println("DexKnife: From Mapping");
-            // get classes from mapping
-            mainClasses = getMainClassesFromMapping(mappingFile, dexKnifeConfig.patternSet,
-                    mainCls);
+        // 2.process the global filter
+        List<String> mainClasses = null;
+        if (dexKnifeConfig.patternSet == null || isPatternSetEmpty(dexKnifeConfig.patternSet)) {
+            // only filter the suggest list
+            if (adtMainClasses != null && adtMainClasses.size() > 0) {
+                mainClasses = new ArrayList<>();
+                Set<Map.Entry<String, Boolean>> entries = adtMainClasses.entrySet();
+                for (Map.Entry<String, Boolean> entry : entries) {
+                    if (entry.getValue()) {
+                        mainClasses.add(entry.getKey());
+                    }
+                }
+            }
         } else {
-            System.out.println("DexKnife: From MergedJar: " + jarMergingOutputFile);
-            if (jarMergingOutputFile != null) {
-                // get classes from merged jar
-                mainClasses = getMainClassesFromJar(jarMergingOutputFile, dexKnifeConfig.patternSet,
-                        mainCls);
+            if (minifyEnabled) {
+                System.err.println("DexKnife: From Mapping");
+                // get classes from mapping
+                mainClasses = getMainClassesFromMapping(mappingFile, dexKnifeConfig.patternSet, adtMainClasses);
             } else {
-                System.err.println("DexKnife: The Merged Jar is not exist! Can't be processed!");
+                System.out.println("DexKnife: From MergedJar: " + jarMergingOutputFile);
+                if (jarMergingOutputFile != null) {
+                    // get classes from merged jar
+                    mainClasses = getMainClassesFromJar(jarMergingOutputFile, dexKnifeConfig.patternSet, adtMainClasses);
+                } else {
+                    System.err.println("DexKnife: The Merged Jar is not exist! Can't be processed!");
+                }
             }
         }
 
+        // 3.create the miandexlist
         if (mainClasses != null && mainClasses.size() > 0) {
             BufferedWriter writer = new BufferedWriter(new FileWriter(keepFile));
 
@@ -339,13 +354,24 @@ public class DexSplitTools {
         throw new Exception("DexKnife Warning: Main dex is EMPTY ! Check your config and project!");
     }
 
+    /**
+     * Gets main classes from jar.
+     *
+     * @param jarMergingOutputFile the jar merging output file
+     * @param mainDexPattern       the main dex pattern
+     * @param adtMainCls           the filter mapping of suggest classes
+     * @return the main classes from jar
+     * @throws Exception the exception
+     * @author ceabie
+     */
     private static ArrayList<String> getMainClassesFromJar(
-            File jarMergingOutputFile, PatternSet mainDexPattern, HashSet<String> mainCls)
+            File jarMergingOutputFile, PatternSet mainDexPattern, Map<String, Boolean> adtMainCls)
             throws Exception {
         ZipFile clsFile = new ZipFile(jarMergingOutputFile);
         Spec<FileTreeElement> asSpec = getMaindexSpec(mainDexPattern);
         ClassFileTreeElement treeElement = new ClassFileTreeElement();
 
+        // lists classes from jar.
         ArrayList<String> mainDexList = new ArrayList<>();
         Enumeration<? extends ZipEntry> entries = clsFile.entries();
         while (entries.hasMoreElements()) {
@@ -355,8 +381,7 @@ public class DexSplitTools {
             if (entryName.endsWith(CLASS_SUFFIX)) {
                 treeElement.setClassPath(entryName);
 
-                if (asSpec.isSatisfiedBy(treeElement)
-                        || (mainCls != null && mainCls.contains(entryName))) {
+                if (isAtMainDex(adtMainCls, entryName, treeElement, asSpec)) {
                     mainDexList.add(entryName);
                 }
             }
@@ -370,23 +395,23 @@ public class DexSplitTools {
     /**
      * Gets main classes from mapping.
      *
-     * @param mapping the mapping file
+     * @param mapping        the mapping file
      * @param mainDexPattern the main dex pattern
-     * @param mainCls the main cls
+     * @param adtMainCls     the filter mapping of suggest classes
      * @return the main classes from mapping
      * @throws Exception the exception
      * @author ceabie
      */
-    private static ArrayList<String> getMainClassesFromMapping(
+    private static List<String> getMainClassesFromMapping(
             File mapping,
             PatternSet mainDexPattern,
-            HashSet<String> mainCls) throws Exception {
+            Map<String, Boolean> adtMainCls) throws Exception {
 
         String line;
-        ArrayList<String> mainDexList = new ArrayList<>();
-        BufferedReader reader = new BufferedReader(new FileReader(mapping));
+        List<String> mainDexList = new ArrayList<>();
+        BufferedReader reader = new BufferedReader(new FileReader(mapping)); // all classes
 
-        ClassFileTreeElement treeElement = new ClassFileTreeElement();
+        ClassFileTreeElement filterElement = new ClassFileTreeElement();
         Spec<FileTreeElement> asSpec = getMaindexSpec(mainDexPattern);
 
         while ((line = reader.readLine()) != null) {
@@ -395,16 +420,16 @@ public class DexSplitTools {
             if (line.endsWith(":")) {
                 int flagPos = line.indexOf(MAPPING_FLAG);
                 if (flagPos != -1) {
+                    String sOrgCls = line.substring(0, flagPos).replace('.', '/') + CLASS_SUFFIX;
+                    String sMapCls = line.substring(flagPos + MAPPING_FLAG_LEN, line.length() - 1)
+                            .replace('.', '/') + CLASS_SUFFIX;
 
-                    String sOrg = line.substring(0, flagPos).replace('.', '/') + CLASS_SUFFIX;
-                    treeElement.setClassPath(sOrg);
+                    filterElement.setClassPath(sOrgCls);
 
-                    if (asSpec.isSatisfiedBy(treeElement)
-                            || (mainCls != null && mainCls.contains(sOrg))) {
-                        String sMap = line.substring(flagPos + MAPPING_FLAG_LEN, line.length() - 1)
-                                .replace('.', '/') + CLASS_SUFFIX;
-
-                        mainDexList.add(sMap);
+                    boolean isAtMainDex = isAtMainDex(adtMainCls, sMapCls, filterElement, asSpec);
+                    System.out.println("Filter: " + sOrgCls + " [" + isAtMainDex + "]");
+                    if (isAtMainDex) {
+                        mainDexList.add(sMapCls);
                     }
                 }
             }
@@ -415,46 +440,59 @@ public class DexSplitTools {
         return mainDexList;
     }
 
+    private static boolean isAtMainDex(
+            Map<String, Boolean> mainCls, String sMapCls,
+            ClassFileTreeElement treeElement, Spec<FileTreeElement> asSpec) {
+
+        if (mainCls != null) {
+            Boolean inAdtList = mainCls.get(sMapCls);
+            if (inAdtList != null) {
+                return inAdtList;
+            }
+        }
+
+        return asSpec.isSatisfiedBy(treeElement);
+    }
+
     /**
-     * get the maindexlist of android gradle plugin
+     * get the maindexlist of android gradle plugin.
+     * if enable ProGuard, return the mapped class.
      */
-    private static HashSet<String> getAdtMainDexClasses(File outputDir, PatternSet mainDexPattern,
-            boolean logFilter)
-            throws Exception {
+    private static Map<String, Boolean> getAdtMainDexClasses(
+            File outputDir,
+            PatternSet mainDexPattern,
+            boolean logFilter) throws Exception {
+
         if (outputDir == null || !outputDir.exists()) {
-            System.err.println(
-                    "DexKnife Warning: Android recommand Main dex is no exist, try run again!");
+            System.err.println("DexKnife Warning: Android recommand Main dex is no exist, try run again!");
             return null;
         }
 
-        HashSet<String> mainCls = new HashSet<>();
+        HashMap<String, Boolean> mainCls = new HashMap<>();
         BufferedReader reader = new BufferedReader(new FileReader(outputDir));
 
         ClassFileTreeElement treeElement = new ClassFileTreeElement();
-        Spec<FileTreeElement> asSpec = mainDexPattern != null ? getMaindexSpec(mainDexPattern)
-                : null;
+        Spec<FileTreeElement> asSpec = mainDexPattern != null ? getMaindexSpec(mainDexPattern) : null;
 
         String line, clsPath;
         while ((line = reader.readLine()) != null) {
             line = line.trim();
             int clsPos = line.lastIndexOf(CLASS_SUFFIX);
             if (clsPos != -1) {
+                boolean satisfiedBy = true;
+
                 if (asSpec != null) {
                     clsPath = line.substring(0, clsPos).replace('.', '/') + CLASS_SUFFIX;
                     treeElement.setClassPath(clsPath);
 
-                    boolean satisfiedBy = asSpec.isSatisfiedBy(treeElement);
-                    if (!satisfiedBy) {
-                        if (logFilter)
-                            System.out.println("DexKnife-Suggest: [Split] " + clsPath);
-                        continue;
+                    satisfiedBy = asSpec.isSatisfiedBy(treeElement);
+                    if (logFilter) {
+                        System.out.println("DexKnife-Suggest: [" +
+                                (satisfiedBy ? "Keep" : "Split") + "]  " + clsPath);
                     }
-
-                    if (logFilter)
-                        System.out.println("DexKnife-Suggest: [Keep]  " + clsPath);
                 }
 
-                mainCls.add(line);
+                mainCls.put(line, satisfiedBy);
             }
         }
 

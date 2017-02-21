@@ -18,7 +18,6 @@ package com.ceabie.dexknife
 import com.android.build.api.transform.Format
 import com.android.build.api.transform.Transform
 import com.android.build.gradle.api.ApplicationVariant
-import com.android.build.gradle.internal.incremental.InstantRunBuildContext
 import com.android.build.gradle.internal.pipeline.TransformTask
 import com.android.build.gradle.internal.transforms.DexTransform
 import org.gradle.api.Project
@@ -127,7 +126,7 @@ public class SplitToolsFor150 extends DexSplitTools {
     private static boolean isInInstantRunMode(Object variant) {
         try {
             def scope = variant.getVariantData().getScope()
-            InstantRunBuildContext instantRunBuildContext = scope.getInstantRunBuildContext()
+            def instantRunBuildContext = scope.getInstantRunBuildContext()
             return instantRunBuildContext.isInInstantRunMode()
         } catch (Throwable e) {
         }

@@ -2,16 +2,26 @@ apply plugin: 'com.android.application'
 apply plugin: 'dexknifePlus'
 
 android {
-    compileSdkVersion Integer.parseInt(project.COMPILE_SDK_VER)
-    buildToolsVersion project.BUILD_TOOLS_VER
+    compileSdkVersion 23
+    buildToolsVersion '23.0.3'
 
     defaultConfig {
-        minSdkVersion Integer.parseInt(project.MIN_SDK_VER)
-        targetSdkVersion Integer.parseInt(project.TARGET_SDK_VERSION)
+        minSdkVersion 14
+        targetSdkVersion 23
         versionCode 1
         versionName "1.0"
 
         multiDexEnabled true
+    }
+
+    //签名
+    signingConfigs {
+        key {
+            storeFile file('mutidex.jks')
+            storePassword '123456'
+            keyAlias 'king'
+            keyPassword '123456'
+        }
     }
 
     productFlavors{
@@ -26,12 +36,13 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
+            signingConfig signingConfigs.key
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
 
         debug {
-//            minifyEnabled true
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
@@ -48,7 +59,7 @@ dexKnife{
     //1.如果没有可选参数，将根据enabled决定是否分包。
     //2.如果有可选参数，需满足必选参数和可选参数的条件才允许分包
     productFlavor 'mock'
-    buildType 'debug'
+    //buildType 'debug'
 
     /*
     *eg:当前productFlavors = dev，buildType = debug，

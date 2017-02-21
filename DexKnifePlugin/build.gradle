@@ -1,12 +1,13 @@
 buildscript {
     repositories {
+        //maven { url uri('./repo') }
         jcenter()
         mavenCentral()
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.0'
-        classpath 'com.library.tangxiaolv:dexknife-plus:1.0.1'
+        classpath 'com.android.tools.build:gradle:2.2.3'
+        classpath 'com.library.tangxiaolv:dexknife-plus:1.0.3'
     }
 }
 
