@@ -1,6 +1,6 @@
 #Android傻瓜式分包插件
 注1：不想看前半部分的话可以直接跳过到最下面配置部分。  
-注2：本插件是基于[DexKnifePlugin 1.5.9](https://github.com/ceabie/DexKnifePlugin)优化改造而来，感谢ceabie的无私奉献。
+注2：本插件是基于[DexKnifePlugin 1.6.0](https://github.com/ceabie/DexKnifePlugin)优化改造而来，感谢ceabie的无私奉献。
 
 ##填坑之路  
 ###坑1：65536 ，So easy!   
@@ -10,7 +10,7 @@
 **解决：**  
 ```
 dependencies { 
-	compile 'com.android.support:MultiDex:1.0.2'
+	compile 'com.android.support:MultiDex:1.0.1'
 }
 ```
 继承 Application ，重写 attachBaseContext(Context)
@@ -111,9 +111,14 @@ afterEvaluate {
 ```
 buildscript {
     dependencies {
-        classpath 'com.library.tangxiaolv:dexknife-plus:1.0.1'
+        classpath 'com.library.tangxiaolv:dexknife-plus:1.0.3'
     }
 }
+
+Notes:Version Mappting
+1.0.3 -> DexKnifePlugin 1.6.0 
+1.0.2 -> DexKnifePlugin 1.5.9
+1.0.1 -> DexKnifePlugin 1.5.6
 ```
 **第二步：在你的App模块的build.gradle添加插件**
 ```
