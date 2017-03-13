@@ -124,8 +124,8 @@ android{
 dependencies { 
     compile 'com.android.support:MultiDex:1.0.1'
 }
-在继承的 Application中重写 attachBaseContext(Context)
 
+在继承的 Application中重写 attachBaseContext(Context)
 @Override 
 protected void attachBaseContext(Context base) {
     super.attachBaseContext(base);
