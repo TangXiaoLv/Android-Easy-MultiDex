@@ -9,6 +9,12 @@
 
 **解决：**  
 ```
+android{
+	defaultConfig {
+		multiDexEnabled true
+	}
+}
+
 dependencies { 
 	compile 'com.android.support:MultiDex:1.0.1'
 }
@@ -107,24 +113,38 @@ afterEvaluate {
 于是乎就将Gradle脚本整合进了插件，这样只需维护一个配置文件就行了。读者可以根据自己需求自行选择分开配置还是整合配置。通过这种方式我们把主Dex的方法数维持在15000左右，从此再也不用担心方法数问题了！！！
 
 ##配置部分
-**第一步：添加根目录Gradle**
+**第一步：添加分包支持**
+```
+android{
+	defaultConfig {
+		multiDexEnabled true
+	}
+}
+
+dependencies { 
+    compile 'com.android.support:MultiDex:1.0.1'
+}
+在继承的 Application中重写 attachBaseContext(Context)
+
+@Override 
+protected void attachBaseContext(Context base) {
+    super.attachBaseContext(base);
+    MultiDex.install(this);
+}
+```
+**第二步：添加根目录Gradle**
 ```
 buildscript {
     dependencies {
         classpath 'com.library.tangxiaolv:dexknife-plus:1.0.3'
     }
 }
-
-Notes:Version Mappting
-1.0.3 -> DexKnifePlugin 1.6.0 
-1.0.2 -> DexKnifePlugin 1.5.9
-1.0.1 -> DexKnifePlugin 1.5.6
 ```
-**第二步：在你的App模块的build.gradle添加插件**
+**第三步：在你的App模块的build.gradle添加插件**
 ```
 apply plugin: 'dexknifePlus'
 ```
-**第三步：配置参数**  
+**第四步：配置参数**  
 ```
 dexKnife{
     //必选参数
@@ -144,7 +164,7 @@ dexKnife{
     * */
 }
 ```
-**第四步：在你的App模块目录下新建dexknife.txt，并自定义配置**
+**第五步：在你的App模块目录下新建dexknife.txt，并自定义配置**
 ```
 #为注释符
 
@@ -179,7 +199,7 @@ dexKnife{
 #-log-mainlist
 ```
 
-**第五步：在 defaultConfig 或者 buildTypes中打开 multiDexEnabled true，否则不起作用**
+**第六步：在 defaultConfig 或者 buildTypes中打开 multiDexEnabled true，否则不起作用**
 
 ##已知错误
 
