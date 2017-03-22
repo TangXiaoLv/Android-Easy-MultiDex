@@ -1,9 +1,9 @@
-#Android傻瓜式分包插件
+# Android傻瓜式分包插件
 注1：不想看前半部分的话可以直接跳过到最下面配置部分。  
 注2：本插件是基于[DexKnifePlugin 1.6.0](https://github.com/ceabie/DexKnifePlugin)优化改造而来，感谢ceabie的无私奉献。
 
-##填坑之路  
-###坑1：65536 ，So easy!   
+## 填坑之路  
+### 坑1：65536 ，So easy!   
 **原因：**Dalvik 的 invoke-kind 指令集中，method reference index 只留了 16 bits，最多能引用 65535 个方法。  
 参考=>[由Android 65K方法数限制引发的思考](http://jayfeng.com/2016/03/10/%E7%94%B1Android-65K%E6%96%B9%E6%B3%95%E6%95%B0%E9%99%90%E5%88%B6%E5%BC%95%E5%8F%91%E7%9A%84%E6%80%9D%E8%80%83/).  
 
@@ -28,7 +28,7 @@ protected void attachBaseContext(Context base) {
 }
 ```
 
-###坑2：Too many classes in –main-dex-list ，what？  
+### 坑2：Too many classes in –main-dex-list ，what？  
 **原因：**通过上面的官方分包，已经把原Dex分为1主Dex加多从Dex。主Dex包含所有4大组件，Application，Annotation，multidex等及其必要的直接依赖。由于我们方法数已达到16W之巨，上百个Activity全部塞进主Dex，又成功的把主Dex撑爆了。  
 
 **解决：**
@@ -47,17 +47,17 @@ afterEvaluate {
 ```
 参考=>[Android Dex分包之旅](http://yydcdut.com/2016/03/20/split-dex/index.html)
 
-###坑3：gradle 1.5.0之后不支持这种写法 ，what the fuck？  
+### 坑3：gradle 1.5.0之后不支持这种写法 ，what the fuck？  
 **原因：**官方解释Gralde`1.5.0`以上已经将(jacoco, progard, multi-dex)统一移到[Transform API](http://tools.android.com/tech-docs/new-build-system/transform-api)里，然而Transform API并没有想象的那么简单好用，翻遍Google终于找到一个兼容Gradle `1.5.0`以上的分包插件[DexKnifePlugin](https://github.com/ceabie/DexKnifePlugin)。  
 扩展=>这篇[Android 热修复使用Gradle Plugin1.5改造Nuwa插件](http://blog.csdn.net/sbsujjbcy/article/details/50839263)比较好的介绍了Transform API的使用。
 
-###坑4：NoClassDefFoundError ，are you kiding me？  
+### 坑4：NoClassDefFoundError ，are you kiding me？  
 **原因：**通过插件手动指定main dex中要保留的类，虽然分包成功，但是main dex中的类及其直接引用类很难通过手动的方式指定。  
 
 **解决方式：**  
 [美团Android DEX自动拆包及动态加载简介](http://tech.meituan.com/mt-android-auto-split-dex.html),他们是通过编写了一个能够自动分析Class依赖的脚本去算出主Dex需要包含的所有必要依赖。看来写脚本是跑不掉了。
 
-###坑5：自定义脚本 ，read the fuck source！  
+### 坑5：自定义脚本 ，read the fuck source！  
 **问题一：**哪些类是需要放入主Dex中？  
 查看sdk\build-tools\platform-version\mainDexClasses.rules发现放入主Dex相关类有Instrumentation，Application，Activity，Service，ContentProvider，BroadcastReceiver，BackupAgent的所有子类。
 
@@ -101,18 +101,18 @@ afterEvaluate {
 }
 ```
 
-###坑6：主dex依然爆表，shit again！  
+### 坑6：主dex依然爆表，shit again！  
 其实上面那段脚本已经成功筛选出我们想要放入主Dex的`manifest_keep列表`和`maindexlist列表`，但是在打包的时候还是把所有类打进主Dex(已无语)。这个时候就需要跟[DexKnifePlugin](https://github.com/ceabie/DexKnifePlugin)插件配合使用，首先在gradle中加上上述脚本，然后使用插件时在配置文件中加上 `-split **.**`和`#-donot-use-suggest`。DexKnifePlugin插件运行原理很简单，在生成Dex任务之前首先读取自己的配置文件(包含前面我们通过Gradle脚本生成的`maindexlist`列表)，然后扫描combined.jar(包含工程中所有.class文件)匹配出我们自定义的maindexlist.txt，再替换掉build/multi-dex/maindexlist.txt，和build实例。这样分包的时候就会基于我们的规则生成主Dex。
 
-###坑7：ANR，HAHAHA！  
+### 坑7：ANR，HAHAHA！  
 我们最低API=16，测试并未发现ANR问题，所以暂时没考虑景上添花，这个问题比较好解决。  
 参考=>[Android Dex分包之旅](http://yydcdut.com/2016/03/20/split-dex/index.html)
 
-###Congratulation
+### Congratulation
 恭喜，填坑终于结束，不过还有点不爽的是需要同时维护Gradle脚本和插件的配置。
 于是乎就将Gradle脚本整合进了插件，这样只需维护一个配置文件就行了。读者可以根据自己需求自行选择分开配置还是整合配置。通过这种方式我们把主Dex的方法数维持在15000左右，从此再也不用担心方法数问题了！！！
 
-##配置部分
+## 配置部分
 **第一步：添加分包支持**
 ```
 android{
@@ -201,7 +201,7 @@ dexKnife{
 
 **第六步：在 defaultConfig 或者 buildTypes中打开 multiDexEnabled true，否则不起作用**
 
-##已知错误
+## 已知错误
 
 注：分包的时候如果发现一些莫名的错误，可以关掉instant run，一般都能解决
 
