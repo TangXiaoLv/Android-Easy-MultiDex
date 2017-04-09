@@ -1,6 +1,6 @@
 # Android傻瓜式分包插件
 注1：不想看前半部分的话可以直接跳过到最下面配置部分。  
-注2：本插件是基于[DexKnifePlugin 1.6.0](https://github.com/ceabie/DexKnifePlugin)优化改造而来，感谢ceabie的无私奉献。
+注2：本插件是基于[DexKnifePlugin 1.6.2](https://github.com/ceabie/DexKnifePlugin)优化改造而来，感谢ceabie的无私奉献。
 
 ## 填坑之路  
 ### 坑1：65536 ，So easy!   
@@ -200,6 +200,8 @@ dexKnife{
 ```
 
 **第六步：在 defaultConfig 或者 buildTypes中打开 multiDexEnabled true，否则不起作用**
+
+**使用前先参阅 DexKnife 的[特性部分](https://github.com/ceabie/DexKnifePlugin#特性重要)**
 
 ## 已知错误
 
