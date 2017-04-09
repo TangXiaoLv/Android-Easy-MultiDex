@@ -13,15 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.ceabie.dexknife
+package com.tangxiaolv.dexknife
 
+import com.ceabie.dexknife.DexKnifePlugin
+import com.ceabie.dexknife.DexSplitTools
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
 /**
  * the spilt tools plugin.
  */
-public class DexKnifePlugin implements Plugin<Project> {
+public class DexKnifePlusPlugin implements Plugin<Project> {
 
     @Override
     void apply(Project project) {
@@ -48,21 +50,11 @@ public class DexKnifePlugin implements Plugin<Project> {
 
                         filterActivity(project);
 
-                        if (isMultiDexEnabled(variant)) {
-                            if (SplitToolsFor130.isCompat(variant)) {
-                                System.err.println("DexKnife: Compat 1.3.0.");
-                                SplitToolsFor130.processSplitDex(project, variant)
-                            } else if (SplitToolsFor150.isCompat()) {
-                                SplitToolsFor150.processSplitDex(project, variant)
-                            } else {
-                                System.err.println("DexKnife Error: DexKnife is not compatible your Android gradle plugin.");
-                            }
-                        } else {
-                            System.err.println("DexKnife : MultiDexEnabled is false, it's not work.");
-                        }
+                        DexKnifePlugin.dexKnifeProcessVariant(project, variant)
                     }
+                } else {
+                    printf "-DexKnifePlugin Enable = false\n";
                 }
-                printf "-DexKnifePlugin Enable = false\n";
             }
         }
     }
@@ -103,19 +95,4 @@ public class DexKnifePlugin implements Plugin<Project> {
             }
         }
     }
-
-    private static boolean isMultiDexEnabled(variant) {
-        def is = variant.buildType.multiDexEnabled
-        if (is != null) {
-            return is;
-        }
-
-        is = variant.mergedFlavor.multiDexEnabled
-        if (is != null) {
-            return is;
-        }
-
-        return false
-    }
-
 }

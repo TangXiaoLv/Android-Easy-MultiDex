@@ -1,4 +1,4 @@
-package com.ceabie.dexknife
+package com.tangxiaolv.dexknife
 
 class DexKnifeExtension {
     boolean enabled = false
