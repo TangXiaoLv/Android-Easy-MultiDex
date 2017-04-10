@@ -170,11 +170,11 @@ dexKnife{
 ```
 #为注释符
 
-#-----------主Dex中必要依赖的脚本配置-----------
-#默认保留四大组件中其他三大组件(并计算其依赖树)，Activity组件选择性保留(使用-just activity 选项),若为空不保留任何Activity
+#-----------主Dex中必要依赖的脚本配置-----------(支持依赖检测)
+#默认保留四大组件中Service,ContentProvider,BroadcastReceiver三大组件,Activity组件选择性保留,若为空不保留任何Activity
 -just activity com.ceabie.demo.MainActivity
 
-#-----------附加类-----------
+#-----------附加类-----------(不支持依赖检测)
 # 如果你想要某个包路径在maindex中，则使用 -keep 选项，即使他已经在分包的路径中.若为空，不保留任意类
 #-keep com.ceabie.demo.**
 
