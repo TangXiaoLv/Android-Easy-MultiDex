@@ -1,4 +1,6 @@
 # Android傻瓜式分包插件
+[ ![Download](https://api.bintray.com/packages/tangxiaolv/maven/dexknife-plus/images/download.svg?version=1.0.4) ](https://bintray.com/tangxiaolv/maven/dexknife-plus/1.0.4/link)
+
 注1：不想看前半部分的话可以直接跳过到最下面配置部分。  
 注2：本插件是基于[DexKnifePlugin 1.6.2](https://github.com/ceabie/DexKnifePlugin)优化改造而来，感谢ceabie的无私奉献。
 
