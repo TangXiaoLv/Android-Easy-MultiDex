@@ -136,7 +136,7 @@ protected void attachBaseContext(Context base) {
 ```
 buildscript {
     dependencies {
-        classpath 'com.library.tangxiaolv:dexknife-plus:1.0.3'
+        classpath 'com.library.tangxiaolv:dexknife-plus:1.0.4'
     }
 }
 ```
