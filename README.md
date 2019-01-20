@@ -1,3 +1,6 @@
+# Deprecated
+plz use [multiDexKeepProguard](https://developer.android.com/studio/build/multidex?hl=zh-cn) to splite main dex classes.
+
 # Android傻瓜式分包插件
 [ ![Download](https://api.bintray.com/packages/tangxiaolv/maven/dexknife-plus/images/download.svg?version=1.0.4) ](https://bintray.com/tangxiaolv/maven/dexknife-plus/1.0.4/link)
 
